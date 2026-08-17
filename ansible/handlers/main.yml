@@ -1,0 +1,7 @@
+---
+# handlers/main.yml
+- name: Bootstrap audiomxd governor
+  ansible.builtin.command: launchctl bootstrap system /Library/LaunchDaemons/com.macfixes.audiomxd-governor.plist
+  register: bootstrap_out
+  failed_when: bootstrap_out.rc != 0 and 'service already bootstrapped' not in bootstrap_out.stderr
+  changed_when: bootstrap_out.rc == 0

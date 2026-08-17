@@ -1,0 +1,78 @@
+---
+# tasks/main.yml - macOS Tahoe audiomxd Spin-Loop Fleet Remediation Role
+
+- name: Create local binary directory
+  ansible.builtin.file:
+    path: /usr/local/libexec
+    state: directory
+    owner: root
+    group: wheel
+    mode: '0755'
+
+- name: Deploy audiomxd governor daemon script
+  ansible.builtin.copy:
+    dest: /usr/local/libexec/audiomxd-governor.py
+    owner: root
+    group: wheel
+    mode: '0755'
+    content: |
+      #!/usr/bin/env python3
+      import os, sys, time, signal, subprocess
+      def get_console_uid():
+          try: return os.stat('/dev/console').st_uid
+          except Exception: return 0
+      def get_audiomxd_pid_and_stat():
+          try:
+              out = subprocess.check_output("ps -p $(pgrep audiomxd) -o pid,stat", shell=True, text=True).strip().splitlines()
+              if len(out) > 1:
+                  parts = out[1].split()
+                  return int(parts[0]), parts[1]
+          except Exception: pass
+          return None, None
+      def main():
+          while True:
+              try:
+                  uid = get_console_uid()
+                  pid, stat = get_audiomxd_pid_and_stat()
+                  if pid is not None and stat is not None:
+                      is_headless = (uid < 500)
+                      is_stopped = ('T' in stat)
+                      if is_headless and not is_stopped:
+                          try: os.kill(pid, signal.SIGSTOP)
+                          except ProcessLookupError: pass
+                      elif not is_headless and is_stopped:
+                          try: os.kill(pid, signal.SIGCONT)
+                          except ProcessLookupError: pass
+                  time.sleep(2)
+              except Exception: time.sleep(2)
+      if __name__ == '__main__': main()
+
+- name: Deploy audiomxd governor LaunchDaemon plist
+  ansible.builtin.copy:
+    dest: /Library/LaunchDaemons/com.macfixes.audiomxd-governor.plist
+    owner: root
+    group: wheel
+    mode: '0644'
+    content: |
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
+      <dict>
+          <key>Label</key>
+          <string>com.macfixes.audiomxd-governor</string>
+          <key>ProgramArguments</key>
+          <array>
+              <string>/usr/bin/python3</string>
+              <string>/usr/local/libexec/audiomxd-governor.py</string>
+          </array>
+          <key>RunAtLoad</key>
+          <true/>
+          <key>KeepAlive</key>
+          <true/>
+          <key>StandardOutPath</key>
+          <string>/var/log/audiomxd-governor.log</string>
+          <key>StandardErrorPath</key>
+          <string>/var/log/audiomxd-governor.log</string>
+      </dict>
+      </plist>
+  notify: Bootstrap audiomxd governor
