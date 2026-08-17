@@ -143,7 +143,7 @@ audiomxd-governor/
     ├── root_cause_analysis.md         # Detailed 11-step loop breakdown & timing
     ├── disassembly_trace.md           # ARM64 assembly of MediaExperience & BluetoothServices
     ├── reproducing_the_bug.md         # Step-by-step reproduction instructions
-    ├── xpc_architecture_diagram.md   # Mermaid sequence & state machine diagrams
+    ├── xpc_architecture_diagram.md    # Mermaid sequence & state machine diagrams
     └── apple_feedback_template.md     # Upstream-resolved Radar / Feedback reference
 ```
 
