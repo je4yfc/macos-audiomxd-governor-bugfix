@@ -2,7 +2,6 @@
 
 This document catalogs the exact ARM64 assembly instructions extracted from macOS Tahoe frameworks that substantiate the failure mechanism.
 
----
 
 ## 1. `-[MXAudioAccessoryServices handleServerDeath]`
 **Framework**: `/System/Library/PrivateFrameworks/MediaExperience.framework/MediaExperience`  
@@ -25,7 +24,6 @@ MediaExperience`-[MXAudioAccessoryServices handleServerDeath]:
 0x19d1ee778 <+152>: retab
 ```
 
----
 
 ## 2. `__45-[MXAudioAccessoryServices handleServerDeath]_block_invoke`
 **Framework**: `MediaExperience.framework`  
@@ -49,7 +47,6 @@ MediaExperience`__45-[MXAudioAccessoryServices handleServerDeath]_block_invoke:
 0x19d1ee7f0 <+112>: retab
 ```
 
----
 
 ## 3. `-[MXSessionManager audioAccessoryServerDiedCallback:]`
 **Framework**: `MediaExperience.framework`  
@@ -67,7 +64,6 @@ MediaExperience`-[MXSessionManager audioAccessoryServerDiedCallback:]:
 0x19d1f3a58 <+116>: retab
 ```
 
----
 
 ## 4. `libsystem_featureflags.dylib` Fastpath / Slowpath Mechanics
 **Framework**: `/usr/lib/system/libsystem_featureflags.dylib`

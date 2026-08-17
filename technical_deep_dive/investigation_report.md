@@ -5,7 +5,6 @@
 **Classification**: Unthrottled Daemon IPC Recovery Loop & Unified Logging Runaway  
 **Remediation**: Runtime Session Governor Daemon  
 
----
 
 ## 1. Executive Summary & Diagnostic Baseline
 
@@ -17,7 +16,6 @@ On Apple Silicon Mac systems running macOS Tahoe 26.3 (Build 25D125) and macOS S
 - **Log Emission**: Over **24,800 entries/sec** (~1.48 million lines/minute) during unthrottled bursts, saturating Unified Logging subsystems and exhausting disk space in `/var/db/diagnostics` and `/var/log` within days.
 - **Hardware Audio HAL**: `/usr/sbin/coreaudiod` (UID 202 `_coreaudiod`, PID 463) and hardware output drivers (Built-in Mac mini Speakers, HDMI audio) remain normal and unaffected, confirming the failure is isolated to the high-level session/routing daemon (`audiomxd`).
 
----
 
 ## 2. Low-Level Root Cause & Causal Mechanism
 
@@ -62,7 +60,6 @@ The fault arises from an unhandled session boundary condition in Apple's audio r
 
 Neither `handleServerDeath` nor `audioAccessoryServerDiedCallback:` incorporates retry backoff, delays, or checks for an active console session.
 
----
 
 ## 3. Empirical Evidence & Controlled Experiment Matrix
 
@@ -85,7 +82,6 @@ To evaluate potential remediations, 6 configurations were tested on an affected 
 
 *Signatures evaluated*: `TargetUserSession NULL 0` / `TargetUserSession, but no console user?`, `audioaccessoryd died`, `Syncing with AudioAccessoryServices as they just recovered`.
 
----
 
 ## 4. FeatureFlag Consumer & Call-Site Analysis
 
@@ -101,7 +97,6 @@ Reverse-engineering Darwin frameworks with LLDB revealed why FeatureFlags alone 
 - **Function**: Controls AirPods automatic switching proximity scoring.
 - **Finding**: Disabling proximity scoring does not bypass `BTAudioRoutingRequest` initialization. `BTAudioRoutingRequest` still performs its base session verification, finds `NULL`, and triggers the failure callback.
 
----
 
 ## 5. Architectural Evaluation of the Native MachService Shim
 
@@ -110,7 +105,6 @@ An alternative approach—providing a native C responder for `com.apple.AudioAcc
 2. **Protocol Simulation**: Returning empty dictionaries with `kError = 0` satisfies the initial handshake, but does not provide complete state transitions for active audio sessions.
 3. **Verdict**: **Semantically unsafe for mixed interactive/headless environments**.
 
----
 
 ## 6. Validated Remediation: The Runtime Session Governor
 

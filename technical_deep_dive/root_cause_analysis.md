@@ -6,7 +6,6 @@ On macOS Tahoe 26.x (and Apple Silicon macOS 15.x releases), headless systems, u
 
 This document presents the low-level binary analysis and causal breakdown of why this occurs.
 
----
 
 ## The Subsystem Architecture
 
@@ -38,7 +37,6 @@ graph TD
     I -->|Re-trigger| C
 ```
 
----
 
 ## Detailed Step-by-Step Causal Trace
 
@@ -85,7 +83,6 @@ Inside `BluetoothServices.framework`:
    - Immediately calls `[[MXAudioAccessoryServices sharedInstance] updateAppState:sessions startIO:1]`.
 3. Both `initializeAudioAccessoryConnection` and `updateAppState:startIO:` execute `updateAudioState:`, which immediately checks `TargetUserSession`, fails with `kUnexpectedErr (No user logged in)`, and fires `AudioAccessorydDiedNotification` again.
 
----
 
 ## Timing and Resource Consumption Measurements
 

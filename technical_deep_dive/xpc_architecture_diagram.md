@@ -34,7 +34,6 @@ sequenceDiagram
     Note over BT: Cycle repeats every 177 microseconds (100% CPU on Core)
 ```
 
----
 
 ## State Transition Machine
 

@@ -2,13 +2,11 @@
 
 This document provides exact, reproducible steps to verify the `audiomxd` failure on any Apple Silicon Mac running macOS Tahoe / macOS 15+.
 
----
 
 ## Prerequisites
 - Apple Silicon Mac running macOS Tahoe (or macOS 15.x / 26.x).
 - SSH access or dual session access.
 
----
 
 ## Reproduction Procedure
 
@@ -58,7 +56,6 @@ audiomxd: (MediaExperience) [com.apple.coremedia:] -MXSessionManager- -[MXSessio
 audiomxd: (CoreUtils) [com.apple.bluetooth:BTAudioRoutingRequest] UpdateAudioState CID 0x... audioState Stop apps {}
 ```
 
----
 
 ## Verification of the Fix
 After applying the `audiomxd-governor` daemon:
